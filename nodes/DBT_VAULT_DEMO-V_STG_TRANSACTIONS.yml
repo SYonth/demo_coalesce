@@ -1,10 +1,10 @@
 steps:
-  CITY_BIKE_RAW-16:
+  V_STG_TRANSACTIONS-35:
     operation:
       database: ""
       dataset: ""
-      locationID: 1
-      locationName: DEMO_COALESCE
+      locationID: 6
+      locationName: DBT_VAULT_DEMO
       metadata:
         columns:
           - acceptedValues:
@@ -12,14 +12,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 300
-              stepCounter: 16
+              columnCounter: 658
+              stepCounter: 35
             config: {}
             dataType: NUMBER(38,0)
             defaultValue: ""
             description: ""
-            name: TRIPDURATION
-            nullable: true
+            name: ORDER_ID
+            nullable: false
             primaryKey: false
             uniqueKey: false
           - acceptedValues:
@@ -27,44 +27,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 301
-              stepCounter: 16
-            config: {}
-            dataType: TIMESTAMP_NTZ(9)
-            defaultValue: ""
-            description: ""
-            name: STARTTIME
-            nullable: true
-            primaryKey: false
-            uniqueKey: false
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 302
-              stepCounter: 16
-            config: {}
-            dataType: TIMESTAMP_NTZ(9)
-            defaultValue: ""
-            description: ""
-            name: STOPTIME
-            nullable: true
-            primaryKey: false
-            uniqueKey: false
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 303
-              stepCounter: 16
+              columnCounter: 659
+              stepCounter: 35
             config: {}
             dataType: NUMBER(38,0)
             defaultValue: ""
             description: ""
-            name: START_STATION_ID
-            nullable: true
+            name: CUSTOMER_ID
+            nullable: false
             primaryKey: false
             uniqueKey: false
           - acceptedValues:
@@ -72,14 +42,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 304
-              stepCounter: 16
+              columnCounter: 660
+              stepCounter: 35
             config: {}
-            dataType: VARCHAR(16777216)
+            dataType: DATE
             defaultValue: ""
             description: ""
-            name: START_STATION_NAME
-            nullable: true
+            name: ORDER_DATE
+            nullable: false
             primaryKey: false
             uniqueKey: false
           - acceptedValues:
@@ -87,14 +57,14 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 305
-              stepCounter: 16
+              columnCounter: 661
+              stepCounter: 35
             config: {}
-            dataType: FLOAT
+            dataType: DATE
             defaultValue: ""
             description: ""
-            name: START_STATION_LATITUDE
-            nullable: true
+            name: TRANSACTION_DATE
+            nullable: false
             primaryKey: false
             uniqueKey: false
           - acceptedValues:
@@ -102,28 +72,43 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 306
-              stepCounter: 16
-            config: {}
-            dataType: FLOAT
-            defaultValue: ""
-            description: ""
-            name: START_STATION_LONGITUDE
-            nullable: true
-            primaryKey: false
-            uniqueKey: false
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 307
-              stepCounter: 16
+              columnCounter: 662
+              stepCounter: 35
             config: {}
             dataType: NUMBER(38,0)
             defaultValue: ""
             description: ""
-            name: END_STATION_ID
+            name: TRANSACTION_NUMBER
+            nullable: false
+            primaryKey: false
+            uniqueKey: false
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 663
+              stepCounter: 35
+            config: {}
+            dataType: NUMBER(12,2)
+            defaultValue: ""
+            description: ""
+            name: AMOUNT
+            nullable: false
+            primaryKey: false
+            uniqueKey: false
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 664
+              stepCounter: 35
+            config: {}
+            dataType: VARCHAR(2)
+            defaultValue: ""
+            description: ""
+            name: TYPE
             nullable: true
             primaryKey: false
             uniqueKey: false
@@ -132,13 +117,58 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 308
-              stepCounter: 16
+              columnCounter: 665
+              stepCounter: 35
             config: {}
-            dataType: VARCHAR(16777216)
+            dataType: VARCHAR(16)
             defaultValue: ""
             description: ""
-            name: END_STATION_NAME
+            name: RECORD_SOURCE
+            nullable: false
+            primaryKey: false
+            uniqueKey: false
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 666
+              stepCounter: 35
+            config: {}
+            dataType: DATE
+            defaultValue: ""
+            description: ""
+            name: LOAD_DATE
+            nullable: false
+            primaryKey: false
+            uniqueKey: false
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 667
+              stepCounter: 35
+            config: {}
+            dataType: DATE
+            defaultValue: ""
+            description: ""
+            name: EFFECTIVE_FROM
+            nullable: false
+            primaryKey: false
+            uniqueKey: false
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 668
+              stepCounter: 35
+            config: {}
+            dataType: BINARY(16)
+            defaultValue: ""
+            description: ""
+            name: TRANSACTION_PK
             nullable: true
             primaryKey: false
             uniqueKey: false
@@ -147,13 +177,13 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 309
-              stepCounter: 16
+              columnCounter: 669
+              stepCounter: 35
             config: {}
-            dataType: FLOAT
+            dataType: BINARY(16)
             defaultValue: ""
             description: ""
-            name: END_STATION_LATITUDE
+            name: CUSTOMER_PK
             nullable: true
             primaryKey: false
             uniqueKey: false
@@ -162,96 +192,21 @@ steps:
               values: []
             appliedColumnTests: {}
             columnReference:
-              columnCounter: 310
-              stepCounter: 16
+              columnCounter: 670
+              stepCounter: 35
             config: {}
-            dataType: FLOAT
+            dataType: BINARY(16)
             defaultValue: ""
             description: ""
-            name: END_STATION_LONGITUDE
-            nullable: true
-            primaryKey: false
-            uniqueKey: false
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 311
-              stepCounter: 16
-            config: {}
-            dataType: NUMBER(38,0)
-            defaultValue: ""
-            description: ""
-            name: BIKEID
-            nullable: true
-            primaryKey: false
-            uniqueKey: false
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 312
-              stepCounter: 16
-            config: {}
-            dataType: VARCHAR(16777216)
-            defaultValue: ""
-            description: ""
-            name: MEMBERSHIP_TYPE
-            nullable: true
-            primaryKey: false
-            uniqueKey: false
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 313
-              stepCounter: 16
-            config: {}
-            dataType: VARCHAR(16777216)
-            defaultValue: ""
-            description: ""
-            name: USERTYPE
-            nullable: true
-            primaryKey: false
-            uniqueKey: false
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 314
-              stepCounter: 16
-            config: {}
-            dataType: NUMBER(38,0)
-            defaultValue: ""
-            description: ""
-            name: BIRTH_YEAR
-            nullable: true
-            primaryKey: false
-            uniqueKey: false
-          - acceptedValues:
-              strictMatch: true
-              values: []
-            appliedColumnTests: {}
-            columnReference:
-              columnCounter: 315
-              stepCounter: 16
-            config: {}
-            dataType: NUMBER(38,0)
-            defaultValue: ""
-            description: ""
-            name: GENDER
+            name: ORDER_PK
             nullable: true
             primaryKey: false
             uniqueKey: false
         join:
-          joinCondition: FROM {{ ref('DEMO_COALESCE', 'CITY_BIKE_RAW') }}
-      name: CITY_BIKE_RAW
+          joinCondition: FROM {{ ref('DBT_VAULT_DEMO', 'V_STG_TRANSACTIONS') }}
+      name: V_STG_TRANSACTIONS
       schema: ""
       sqlType: Source
-      table: CITY_BIKE_RAW
+      table: V_STG_TRANSACTIONS
       type: sourceInput
-    stepCounter: "16"
+    stepCounter: "35"

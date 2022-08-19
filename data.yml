@@ -18,9 +18,18 @@ environments:
         id: 5
         locationName: WEATHER_NY
         schema: PUBLIC
+      "6":
+        database: DBT_VAULT_DEMO
+        id: 6
+        locationName: DBT_VAULT_DEMO
+        schema: PUBLIC
     name: DEV
 jobs: {}
 locations:
+  DBT_VAULT_DEMO:
+    default: false
+    id: 6
+    locationName: DBT_VAULT_DEMO
   DEMO_COALESCE:
     default: true
     id: 1
@@ -33,22 +42,411 @@ macros: {}
 packages: {}
 projects: {}
 stepTypes:
-  StepType-1:
-    id: "1"
+  StepType-10:
+    id: "10"
     isDisabled: false
     metadata:
       error: null
       nodeMetadataSpec: |-
-        capitalized: New Type
-        short: NEW
-        tagColor: gray
-        plural: New Types
+        capitalized: Satellite User-Defined
+        short: 'SAT'
+        plural: 'Satellites'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Hub Hash Column
+            type: columnSelector
+            attributeName: isHubHash
+            isRequired: true
+
+          - displayName: Change Hash Column
+            type: columnSelector
+            attributeName: isChangeHash
+            isRequired: true
+            
+          - displayName: Where-SQL
+            attributeName: WhereSql
+            type: textBox
+            isRequired: false      
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false 
+
+        systemColumns:
+        - displayName: "SAT_ATTRIBUTES"
+          transform: "{{SRC}}*.RAW_DATA"
+          dataType: VARIANT
+          placement: end
+          attributeName: isSystemSatAttributes
+
+        - displayName: "HASH_DIFF"
+          transform: "CAST( SHA1( NVL( CAST( RAW_*.RAW_DATA AS VARCHAR), 'null')) AS STRING ) "
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemSatAttributes  
+
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "SYSTEM_SOURCE"
+          transform: "RAW_*.RAW_SYSTEM_SOURCE"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemSystemSource
       templates:
         create:
-          templateString: ""
+          templateString: "{{ stage('Create Satellite Table') }}\r
+
+            \r
+
+            CREATE OR REPLACE TABLE {{
+            ref_no_link(node.location.name, node.name) }}\r
+
+            (\r
+
+            \t{% for col in columns %}\r
+
+            \t\t\"{{ col.name }}\" {{ col.dataType }}\r
+
+            \t\t{%- if not col.nullable %} NOT NULL\r
+
+            \t\t\t{%- if col.defaultValue | length > 0 %} DEFAULT {{
+            col.defaultValue }}{% endif %}\r
+
+            \t\t{% endif %}\r
+
+            \t\t{%- if col.description | length > 0 %} COMMENT '{{
+            col.description }}'{% endif %}\r
+
+            \t\t{%- if not loop.last -%}, {% endif %}\r
+
+            \t{% endfor %}\r
+
+            )\r
+
+            {%- if node.description | length > 0 %} COMMENT = '{{
+            node.description }}'{% endif %}\r\n"
         run:
-          templateString: ""
-    name: Raw
+          templateString: "{% if config.preSQL %}\r
+
+            \t{{ stage('Pre-SQL') }}\r
+
+            \t{{ config.preSQL }}\r
+
+            {% endif %}\r
+
+            \r
+
+            {{ stage('Insert New Rows') }}\r
+
+            INSERT INTO {{ ref_no_link(node.location.name,
+            node.name) }}\r
+
+            WITH \"SAT_CURR_ROWS\" AS (\r
+
+            \t/* get current rows from satellite */\r
+
+            \t{% for col in columns if col.isHubHash or
+            col.isChangeHash %}\r
+
+            \t\t{%- if loop.first -%}SELECT {% endif %} \r
+
+            \t\t{{col.name}}\r
+
+            \t\t{%- if not loop.last -%}, {% endif %}\r
+
+            \t\t{%- if loop.last %} \r
+
+            \t\t\tFROM {{ ref_no_link(node.location.name, node.name)
+            }} \r
+
+            \t\t\tQUALIFY ROW_NUMBER() OVER (PARTITION BY \"{{
+            get_value_by_column_attribute(\"isHubHash\") }}\" ORDER BY \"{{
+            get_value_by_column_attribute(\"isSystemCreateDate\") }}\" DESC) =
+            1\r
+
+            \t\t{% endif %}\r
+
+            \t{% endfor %}\r
+
+            )\r
+
+            \r
+
+            \t{% for source in sources %}\r
+
+            \t\tSELECT DISTINCT\r
+
+            \t\t{% for col in source.columns %}\r
+
+            \t\t\t{{ get_source_transform(col) }} AS \"{{ col.name
+            }}\"\r
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}\r
+
+            \t\t{% endfor %}\r
+
+            \r
+
+            \t\t{{ source.join }}\r
+
+            \t\t\r
+
+            \t\tWHERE\t\t{% if config.WhereSql|length %} \r
+
+            \t\t\t\t\t{{ config.WhereSql }}\r
+
+            \t\t\t\t\t{% else %}\r
+
+            \t\t\t\t\t 1=1 \r
+
+            \t\t\t\t\t{% endif %} \t\r
+
+            \tAND RAW_LOAD_DATE = (SELECT MAX(RAW_LOAD_DATE) {{
+            source.join }})\t\t\t\t\r
+
+            \tAND NOT EXISTS(\r
+
+            \t\tSELECT 1 FROM \"SAT_CURR_ROWS\"\r
+
+            \t\tWHERE \r
+
+            \t\t{% for col in source.columns if col.isHubHash or
+            col.isChangeHash %}\r
+
+            \t\t\t{% if not loop.first %}\r
+
+            \t\t\t\tAND\r
+
+            \t\t\t{% endif %}\r
+
+            \t\t\t{{ get_source_transform(col) }} =
+            \"SAT_CURR_ROWS\".\"{{ col.name }}\"\r
+
+            \t\t{% endfor %}\r
+
+            \t)\r
+
+            \r
+
+            \t{% endfor %}\r
+
+            \r
+
+            {% if config.postSQL %}\r
+
+            \t{{ stage('Post-SQL') }}\r
+
+            \t{{ config.postSQL }}\r
+
+            {% endif %}"
+    name: Sat
+    version: 1
+  StepType-11:
+    id: "11"
+    isDisabled: false
+    metadata:
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Satellite Multi-Active User-Defined
+        short: 'S_MA'
+        plural: 'Satellites Multi-Active'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Hub Hash Column
+            type: columnSelector
+            attributeName: isHubHash
+            isRequired: false
+
+          - displayName: Change Hash Column
+            type: columnSelector
+            attributeName: isChangeHash
+            isRequired: false
+
+          - displayName: Multi-Active Column
+            type: columnSelector
+            attributeName: isMAAttrib
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+      templates:
+        create:
+          templateString: "{{ stage('Create Satellite Table') }}\r
+
+            \r
+
+            \tCREATE OR REPLACE TABLE {{
+            ref_no_link(node.location.name, node.name) }}\r
+
+            \t(\r
+
+            \t\t{% for col in columns %}\r
+
+            \t\t\t\"{{ col.name }}\" {{ col.dataType }}\r
+
+            \t\t\t{%- if not col.nullable %} NOT NULL\r
+
+            \t\t\t\t{%- if col.defaultValue | length > 0 %} DEFAULT
+            {{ col.defaultValue }}{% endif %}\r
+
+            \t\t\t{% endif %}\r
+
+            \t\t\t{%- if col.description | length > 0 %} COMMENT '{{
+            col.description }}'{% endif %}\r
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}\r
+
+            \t\t{% endfor %}\r
+
+            \t)\r
+
+            \t{%- if node.description | length > 0 %} COMMENT = '{{
+            node.description }}'{% endif %}\r
+
+            \r
+
+            {% endif %}"
+        run:
+          templateString: "{% if config.preSQL %}\r
+
+            \t{{ stage('Pre-SQL') }}\r
+
+            \t{{ config.preSQL }}\r
+
+            {% endif %}\r
+
+            \r
+
+            {{ stage('Insert New Rows') }}\r
+
+            INSERT INTO {{ ref_no_link(node.location.name,
+            node.name) }}\r
+
+            WITH \"SAT_CURR_ROWS\" AS (\r
+
+            \t/* get current rows from satellite */\r
+
+            \t{% for col in columns if col.isHubHash or
+            col.isChangeHash or col.isMAAttrib %}\r
+
+            \t\t{%- if loop.first -%}SELECT {% endif %} \r
+
+            \t\t{{col.name}}\r
+
+            \t\t{%- if not loop.last -%}, {% endif %}\r
+
+            \t\t{%- if loop.last %} \r
+
+            \t\t\tFROM {{ ref_no_link(node.location.name, node.name)
+            }} \r
+
+            \t\t\tQUALIFY ROW_NUMBER() OVER (PARTITION BY \"{{
+            get_value_by_column_attribute(\"isHubHash\") }}\",\"{{
+            get_value_by_column_attribute(\"isMAAttrib\") }}\" ORDER BY
+            LOAD_DATE DESC) = 1\r
+
+            \t\t{% endif %}\r
+
+            \t{% endfor %}\r
+
+            )\r
+
+            \r
+
+            \t{% for source in sources %}\r
+
+            \t\tSELECT DISTINCT\r
+
+            \t\t{% for col in source.columns %}\r
+
+            \t\t\t{{ get_source_transform(col) }} AS \"{{ col.name
+            }}\"\r
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}\r
+
+            \t\t{% endfor %}\r
+
+            \r
+
+            \t\t{{ source.join }}\r
+
+            \tWHERE NOT EXISTS(\r
+
+            \t\tSELECT 1 FROM \"SAT_CURR_ROWS\"\r
+
+            \t\tWHERE \r
+
+            \t\t{% for col in source.columns if col.isHubHash or
+            col.isChangeHash or col.isMAAttrib %}\r
+
+            \t\t\t{% if not loop.first %}\r
+
+            \t\t\t\tAND\r
+
+            \t\t\t{% endif %}\r
+
+            \t\t\t{{ get_source_transform(col) }} =
+            \"SAT_CURR_ROWS\".\"{{ col.name }}\"\r
+
+            \t\t{% endfor %}\r
+
+            \t)\r
+
+            \r
+
+            \t{% endfor %}\r
+
+            \r
+
+            {% if config.postSQL %}\r
+
+            \t{{ stage('Post-SQL') }}\r
+
+            \t{{ config.postSQL }}\r
+
+            {% endif %}"
+    name: Multi Active Sat
     version: 1
   StepType-2:
     id: "2"
@@ -394,7 +792,7 @@ stepTypes:
 
             \t\t\t\t\t{% endif %} \r
 
-            \t\tand RAW_LOAD_DATE = (SELECT MAX(RAW_LOAD_DATE) {{
+            \t\tand LOAD_DATE = (SELECT MAX(LOAD_DATE) {{
             source.join }})\r
 
             \t\t{% if not loop.last %}\r
@@ -1028,16 +1426,400 @@ stepTypes:
     metadata:
       error: null
       nodeMetadataSpec: |-
-        capitalized: New Type
-        short: NEW
-        tagColor: gray
-        plural: New Types
+        capitalized: Effectivity Satellite User-Defined
+        short: 'EFF_SAT'
+        plural: 'Satellites'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Link Hash Column
+            type: columnSelector
+            attributeName: isLinkHash
+            isRequired: false
+
+          - displayName: Driving Key Column
+            type: columnSelector
+            attributeName: isDrivingKey
+            isRequired: false
+
+          - displayName: Where-SQL
+            attributeName: WhereSql
+            type: textBox
+            isRequired: false      
+
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          transform: "''"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
       templates:
         create:
-          templateString: ""
+          templateString: "{{ stage('Create Effectivity Satellite Table') }}\r
+
+            \r
+
+            CREATE OR REPLACE TABLE {{
+            ref_no_link(node.location.name, node.name) }}\r
+
+            (\r
+
+            \    {% for col in columns %}\r
+
+            \        \"{{ col.name }}\" {{ col.dataType }}\r
+
+            \        {%- if not col.nullable %} NOT NULL\r
+
+            \            {%- if col.defaultValue | length > 0 %}
+            DEFAULT {{ col.defaultValue }}{% endif %}\r
+
+            \        {% endif %}\r
+
+            \        {%- if col.description | length > 0 %} COMMENT
+            '{{ col.description }}'{% endif %}\r
+
+            \        {%- if not loop.last -%}, {% endif %}\r
+
+            \    {% endfor %}\r
+
+            )\r
+
+            {%- if node.description | length > 0 %} COMMENT = '{{
+            node.description }}'{% endif %}\r\n"
         run:
-          templateString: ""
-    name: New Type
+          templateString: "{% if config.preSQL %}\r
+
+            \    {{ stage('Pre-SQL') }}\r
+
+            \    {{ config.preSQL }}\r
+
+            {% endif %}\r
+
+            \r
+
+            {{ stage('Insert New Rows') }}\r
+
+            INSERT INTO {{ ref_no_link(node.location.name,
+            node.name) }}\r
+
+            WITH \"SAT_CURR_ROWS\" AS (\r
+
+            \    /* get current rows from satellite */\r
+
+            \    {% for col in columns if col.isDrivingKey or
+            col.isLinkHash %}\r
+
+            \        {%- if loop.first -%}SELECT {% endif %} \r
+
+            \        {{col.name}}\r
+
+            \        {%- if not loop.last -%}, {% endif %}\r
+
+            \        {%- if loop.last %} \r
+
+            \            FROM {{ ref_no_link(node.location.name,
+            node.name) }} \r
+
+            \            QUALIFY ROW_NUMBER() OVER (PARTITION BY
+            \"{{ get_value_by_column_attribute(\"isDrivingKey\") }}\" ORDER BY
+            \"{{ get_value_by_column_attribute(\"isSystemCreateDate\") }}\"
+            DESC) = 1\r
+
+            \        {% endif %}\r
+
+            \    {% endfor %}\r
+
+            )\r
+
+            \r
+
+            \    {% for source in sources %}\r
+
+            \        SELECT DISTINCT\r
+
+            \        {% for col in source.columns %}\r
+
+            \            {{ get_source_transform(col) }} AS \"{{
+            col.name }}\"\r
+
+            \            {%- if not loop.last -%}, {% endif %}\r
+
+            \        {% endfor %}\r
+
+            \r
+
+            \        {{ source.join }}\r
+
+            \r
+
+            \tWHERE\t\t{% if config.WhereSql|length %} \r
+
+            \t\t\t\t\t{{ config.WhereSql }}\r
+
+            \t\t\t\t\t{% else %}\r
+
+            \t\t\t\t\t 1=1 \r
+
+            \t\t\t\t\t{% endif %} \t\r
+
+            \tAND RAW_LOAD_DATE = (SELECT MAX(RAW_LOAD_DATE) {{
+            source.join }})\t\r
+
+            \r
+
+            \    AND NOT EXISTS(\r
+
+            \        SELECT 1 FROM \"SAT_CURR_ROWS\"\r
+
+            \        WHERE \r
+
+            \        {% for col in source.columns if
+            col.isDrivingKey or col.isLinkHash %}\r
+
+            \            {% if not loop.first %}\r
+
+            \                AND\r
+
+            \            {% endif %}\r
+
+            \            {{ get_source_transform(col) }} =
+            \"SAT_CURR_ROWS\".\"{{ col.name }}\"\r
+
+            \        {% endfor %}\r
+
+            \    )\r
+
+            \r
+
+            \    {% endfor %}\r
+
+            \r
+
+            {% if config.postSQL %}\r
+
+            \    {{ stage('Post-SQL') }}\r
+
+            \    {{ config.postSQL }}\r
+
+            {% endif %}\r\n"
+    name: Effective Sat
+    version: 1
+  StepType-9:
+    id: "9"
+    isDisabled: false
+    metadata:
+      error: null
+      nodeMetadataSpec: |-
+        capitalized: Link Satellite User-Defined
+        short: 'LSAT'
+        plural: 'Link Satellites'
+        tagColor: '#627DE9'
+
+        config:
+        - groupName: Options
+          items:
+          - type: materializationSelector
+            isRequired: true
+            enableIf: 'false'
+            default: table
+            options:
+            - table
+
+          - displayName: Link Hash Column
+            type: columnSelector
+            attributeName: isLinkHash
+            isRequired: true
+
+          - displayName: Change Hash Column
+            type: columnSelector
+            attributeName: isChangeHash
+            isRequired: true
+
+        - groupName: Pre/Post SQL
+          items:
+          - displayName: Pre-SQL
+            attributeName: preSQL
+            type: textBox
+            isRequired: false
+
+          - displayName: Post-SQL
+            attributeName: postSQL
+            type: textBox
+            isRequired: false
+
+        systemColumns:
+        - displayName: "LOAD_DATE"
+          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          dataType: TIMESTAMP
+          placement: end
+          attributeName: isSystemCreateDate
+
+        - displayName: "RECORD_SOURCE"
+          transform: "''"
+          dataType: VARCHAR
+          placement: end
+          attributeName: isSystemRecordSource
+      templates:
+        create:
+          templateString: "{{ stage('Create Link Satellite Table') }}\r
+
+            \r
+
+            CREATE OR REPLACE TABLE {{
+            ref_no_link(node.location.name, node.name) }}\r
+
+            (\r
+
+            \    {% for col in columns %}\r
+
+            \        \"{{ col.name }}\" {{ col.dataType }}\r
+
+            \        {%- if not col.nullable %} NOT NULL\r
+
+            \            {%- if col.defaultValue | length > 0 %}
+            DEFAULT {{ col.defaultValue }}{% endif %}\r
+
+            \        {% endif %}\r
+
+            \        {%- if col.description | length > 0 %} COMMENT
+            '{{ col.description }}'{% endif %}\r
+
+            \        {%- if not loop.last -%}, {% endif %}\r
+
+            \    {% endfor %}\r
+
+            )\r
+
+            {%- if node.description | length > 0 %} COMMENT = '{{
+            node.description }}'{% endif %}\r\n"
+        run:
+          templateString: "{% if config.preSQL %}\r
+
+            \    {{ stage('Pre-SQL') }}\r
+
+            \    {{ config.preSQL }}\r
+
+            {% endif %}\r
+
+            \r
+
+            {{ stage('Insert New Rows') }}\r
+
+            INSERT INTO {{ ref_no_link(node.location.name,
+            node.name) }}\r
+
+            WITH \"SAT_CURR_ROWS\" AS (\r
+
+            \    /* get current rows from satellite */\r
+
+            \    {% for col in columns if col.isLinkHash or
+            col.isChangeHash %}\r
+
+            \        {%- if loop.first -%}SELECT {% endif %} \r
+
+            \        {{col.name}}\r
+
+            \        {%- if not loop.last -%}, {% endif %}\r
+
+            \        {%- if loop.last %} \r
+
+            \            FROM {{ ref_no_link(node.location.name,
+            node.name) }} \r
+
+            \            QUALIFY ROW_NUMBER() OVER (PARTITION BY
+            \"{{ get_value_by_column_attribute(\"isLinkHash\") }}\" ORDER BY
+            \"{{ get_value_by_column_attribute(\"isSystemCreateDate\") }}\"
+            DESC) = 1\r
+
+            \        {% endif %}\r
+
+            \    {% endfor %}\r
+
+            )\r
+
+            \r
+
+            \    {% for source in sources %}\r
+
+            \        SELECT DISTINCT\r
+
+            \        {% for col in source.columns %}\r
+
+            \            {{ get_source_transform(col) }} AS \"{{
+            col.name }}\"\r
+
+            \            {%- if not loop.last -%}, {% endif %}\r
+
+            \        {% endfor %}\r
+
+            \r
+
+            \        {{ source.join }}\r
+
+            \    WHERE NOT EXISTS(\r
+
+            \        SELECT 1 FROM \"SAT_CURR_ROWS\"\r
+
+            \        WHERE \r
+
+            \        {% for col in source.columns if col.isLinkHash
+            or col.isChangeHash %}\r
+
+            \            {% if not loop.first %}\r
+
+            \                AND\r
+
+            \            {% endif %}\r
+
+            \            {{ get_source_transform(col) }} =
+            \"SAT_CURR_ROWS\".\"{{ col.name }}\"\r
+
+            \        {% endfor %}\r
+
+            \    )\r
+
+            \r
+
+            \    {% endfor %}\r
+
+            \r
+
+            {% if config.postSQL %}\r
+
+            \    {{ stage('Post-SQL') }}\r
+
+            \    {{ config.postSQL }}\r
+
+            {% endif %}\r\n"
+    name: Link Sat
     version: 1
   StepType-Dimension:
     id: Dimension
@@ -3399,11 +4181,7 @@ subgraphs:
   Subgraph-1:
     id: 1
     name: Source Nodes
-    steps:
-      - "18"
-      - "18"
-      - "18"
-      - "19"
+    steps: []
   Subgraph-2:
     id: 2
     name: Hub Nodes

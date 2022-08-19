@@ -1,0 +1,98 @@
+steps:
+  HUB_CUSTOMER-37:
+    operation:
+      config:
+        WhereSql: ""
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: 6
+      locationName: DBT_VAULT_DEMO
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 732
+              stepCounter: 37
+            config:
+              isHubHash: true
+            dataType: NUMBER(38,0)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMERKEY
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 613
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 781
+              stepCounter: "37"
+            dataType: BINARY(16)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMER_PK
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 637
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 776
+              stepCounter: 37
+            config:
+              isHubHash: true
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 657
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 779
+              stepCounter: "37"
+            dataType: VARCHAR(11)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: RECORD_SOURCE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 635
+                    stepCounter: "34"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              V_STG_ORDERS: "34"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: DBT_VAULT_DEMO
+                nodeName: V_STG_ORDERS
+            join:
+              joinCondition: FROM {{ ref('DBT_VAULT_DEMO', 'V_STG_ORDERS') }} "V_STG_ORDERS"
+            name: HUB_CUSTOMER
+            noLinkRefs: []
+      name: HUB_CUSTOMER
+      overrideSQL: false
+      schema: ""
+      sqlType: "4"
+      type: sql
+    stepCounter: "37"
