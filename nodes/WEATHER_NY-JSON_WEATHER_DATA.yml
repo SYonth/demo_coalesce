@@ -1,0 +1,32 @@
+steps:
+  JSON_WEATHER_DATA-21:
+    operation:
+      database: ""
+      dataset: ""
+      locationID: 5
+      locationName: WEATHER_NY
+      metadata:
+        columns:
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 374
+              stepCounter: 21
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            name: V
+            nullable: true
+            primaryKey: false
+            uniqueKey: false
+        join:
+          joinCondition: FROM {{ ref('WEATHER_NY', 'JSON_WEATHER_DATA') }}
+      name: JSON_WEATHER_DATA
+      schema: ""
+      sqlType: Source
+      table: JSON_WEATHER_DATA
+      type: sourceInput
+    stepCounter: "21"

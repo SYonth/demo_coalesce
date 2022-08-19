@@ -1,0 +1,367 @@
+steps:
+  V_JSON_WEATHER_DATA-22:
+    operation:
+      config:
+        insertStrategy: UNION
+        selectDistinct: false
+      database: ""
+      dependencies: []
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: 1
+      locationName: DEMO_COALESCE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 375
+              stepCounter: 22
+            dataType: VARIANT
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: oberservation_time
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:obsTime::timestamp
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 376
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: station_id
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:station::string
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 377
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: city_name
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:name::string
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 378
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: country
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:country::string
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 379
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: city_lat
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:latitude::float
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 380
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: city_lon
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:longitude::float
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 381
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: weather_conditions
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:weatherCondition::string
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 382
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: wheather_condition_code
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:coco::int
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 383
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: temp
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:temp::float
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 384
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: rain
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:prcp::float
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 385
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: tsun
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:tsun::float
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 386
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: wind_dir
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:wdir::float
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 387
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: wind_speed
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:wspd::float
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 388
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: dew_point
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:dwpt::float
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 389
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: relative_humidity
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:rhum::float
+            systemColumnType: None
+            transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 390
+              stepCounter: "22"
+            config: {}
+            dataType: VARIANT
+            defaultValue: ""
+            description: ""
+            keyColumnType: None
+            name: pressure
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 374
+                    stepCounter: "21"
+                transform: v:pres::float
+            systemColumnType: None
+            transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              JSON_WEATHER_DATA: "21"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: WEATHER_NY
+                nodeName: JSON_WEATHER_DATA
+            join:
+              joinCondition: FROM {{ ref('WEATHER_NY', 'JSON_WEATHER_DATA') }}
+                "JSON_WEATHER_DATA"
+            name: V_JSON_WEATHER_DATA
+            noLinkRefs: []
+      name: V_JSON_WEATHER_DATA
+      overrideSQL: false
+      schema: ""
+      sqlType: View
+      type: sql
+    stepCounter: "22"

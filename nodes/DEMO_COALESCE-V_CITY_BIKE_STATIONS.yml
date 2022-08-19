@@ -1,0 +1,138 @@
+steps:
+  V_CITY_BIKE_STATIONS-18:
+    operation:
+      config:
+        insertStrategy: UNION
+        selectDistinct: true
+      database: ""
+      dependencies: []
+      description: ""
+      isDataVault: false
+      isMultisource: true
+      locationID: 1
+      locationName: DEMO_COALESCE
+      materializationType: view
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 336
+              stepCounter: 18
+            dataType: NUMBER(38,0)
+            description: ""
+            name: STATION_ID
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 303
+                    stepCounter: "16"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 307
+                    stepCounter: "16"
+                transform: ""
+          - columnReference:
+              columnCounter: 337
+              stepCounter: 18
+            dataType: VARCHAR(16777216)
+            description: ""
+            name: STATION_NAME
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 304
+                    stepCounter: "16"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 308
+                    stepCounter: "16"
+                transform: ""
+          - columnReference:
+              columnCounter: 338
+              stepCounter: 18
+            dataType: FLOAT
+            description: ""
+            name: STATION_LATITUDE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 305
+                    stepCounter: "16"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 309
+                    stepCounter: "16"
+                transform: ""
+          - columnReference:
+              columnCounter: 339
+              stepCounter: 18
+            dataType: FLOAT
+            description: ""
+            name: STATION_LONGITUDE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 306
+                    stepCounter: "16"
+                transform: ""
+              - columnReferences:
+                  - columnCounter: 310
+                    stepCounter: "16"
+                transform: ""
+          - acceptedValues:
+              strictMatch: true
+              values: []
+            appliedColumnTests: {}
+            columnReference:
+              columnCounter: 349
+              stepCounter: "18"
+            config: {}
+            dataType: STRING
+            defaultValue: ""
+            description: ""
+            hashDetails:
+              hashAlgorithm: SHA1
+            hashedColumns:
+              - columnCounter: 336
+                stepCounter: "18"
+              - columnCounter: 337
+                stepCounter: "18"
+              - columnCounter: 338
+                stepCounter: "18"
+              - columnCounter: 339
+                stepCounter: "18"
+            name: HASH_DIFF
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences: []
+                transform: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - aliases:
+              CITY_BIKE_RAW: "16"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: DEMO_COALESCE
+                nodeName: CITY_BIKE_RAW
+            join:
+              joinCondition: FROM {{ ref('DEMO_COALESCE', 'CITY_BIKE_RAW') }} "CITY_BIKE_RAW"
+            name: V_CITY_BIKE_RAW_START_STATIONS
+            noLinkRefs: []
+          - aliases:
+              CITY_BIKE_RAW: "16"
+            customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: DEMO_COALESCE
+                nodeName: CITY_BIKE_RAW
+            join:
+              joinCondition: FROM {{ ref('DEMO_COALESCE', 'CITY_BIKE_RAW') }} "CITY_BIKE_RAW"
+            name: V_CITY_BIKE_RAW_END_STATIONS
+            noLinkRefs: []
+      name: V_CITY_BIKE_STATIONS
+      overrideSQL: false
+      schema: ""
+      sqlType: View
+      type: sql
+    stepCounter: "18"
