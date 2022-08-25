@@ -101,10 +101,10 @@ stepTypes:
           transform: "CAST( SHA1( NVL( CAST( RAW_*.RAW_DATA AS VARCHAR), 'null')) AS STRING ) "
           dataType: VARCHAR
           placement: end
-          attributeName: isSystemSatAttributes  
+          attributeName: isSystemSatAttributes
 
         - displayName: "LOAD_DATE"
-          transform: CAST(CURRENT_TIMESTAMP AS TIMESTAMP)
+          transform: "CAST(CURRENT_TIMESTAMP AS TIMESTAMP)"
           dataType: TIMESTAMP
           placement: end
           attributeName: isSystemCreateDate
@@ -182,9 +182,8 @@ stepTypes:
             }} \r
 
             \t\t\tQUALIFY ROW_NUMBER() OVER (PARTITION BY \"{{
-            get_value_by_column_attribute(\"isHubHash\") }}\" ORDER BY \"{{
-            get_value_by_column_attribute(\"isSystemCreateDate\") }}\" DESC) =
-            1\r
+            get_value_by_column_attribute(\"isHubHash\") }}\" ORDER BY
+            CAST(CURRENT_TIMESTAMP AS TIMESTAMP) DESC) = 1\r
 
             \t\t{% endif %}\r
 
@@ -223,8 +222,8 @@ stepTypes:
 
             \t\t\t\t\t{% endif %} \t\r
 
-            \tAND RAW_LOAD_DATE = (SELECT MAX(RAW_LOAD_DATE) {{
-            source.join }})\t\t\t\t\r
+            \tAND LOAD_DATE = (SELECT MAX(LOAD_DATE) {{ source.join
+            }})\t\t\t\t\r
 
             \tAND NOT EXISTS(\r
 
@@ -668,11 +667,11 @@ stepTypes:
         - groupName: Options
           items:
           - type: materializationSelector
-            isRequired: true
-            enableIf: 'false'
-            options: 
-            - table
             default: table
+            options:
+            - table
+            - transient table
+            isRequired: true
 
           - displayName: Hub Hash Column
             type: columnSelector
@@ -684,7 +683,7 @@ stepTypes:
           - displayName: Where-SQL
             attributeName: WhereSql
             type: textBox
-            isRequired: false  
+            isRequired: false
           
         - groupName: Pre/Post SQL
           items:
@@ -716,30 +715,71 @@ stepTypes:
 
             \r
 
-            CREATE OR REPLACE TABLE {{
+            {% if node.materializationType == 'table' %}\r
+
+            \r
+
+            \tCREATE OR REPLACE TABLE {{
             ref_no_link(node.location.name, node.name) }}\r
 
-            (\r
+            \t(\r
 
-            \t{% for col in columns %}\r
+            \t\t{% for col in columns %}\r
 
-            \t\t\"{{ col.name }}\" {{ col.dataType }}\r
+            \t\t\t\"{{ col.name }}\" {{ col.dataType }}\r
 
-            \t\t{%- if not col.nullable %} NOT NULL\r
+            \t\t\t{%- if not col.nullable %} NOT NULL\r
 
-            \t\t\t{%- if col.defaultValue | length > 0 %} DEFAULT {{
-            col.defaultValue }}{% endif %}\r
+            \t\t\t\t{%- if col.defaultValue | length > 0 %} DEFAULT
+            {{ col.defaultValue }}{% endif %}\r
 
-            \t\t{% endif %}\r
+            \t\t\t{% endif %}\r
 
-            \t\t{%- if col.description | length > 0 %} COMMENT '{{
+            \t\t\t{%- if col.description | length > 0 %} COMMENT '{{
             col.description }}'{% endif %}\r
 
-            \t\t{%- if not loop.last -%}, {% endif %}\r
+            \t\t\t{%- if not loop.last -%}, {% endif %}\r
 
-            \t{% endfor %}\r
+            \t\t{% endfor %}\r
 
-            )\r
+            \t)\r
+
+            {% endif %}\r
+
+            \r
+
+            {% if node.materializationType == 'transient table' %}\r
+
+            \r
+
+            \tCREATE OR REPLACE TRANSIENT TABLE {{
+            ref_no_link(node.location.name, node.name) }}\r
+
+            \t(\r
+
+            \t\t{% for col in columns %}\r
+
+            \t\t\t\"{{ col.name }}\" {{ col.dataType }}\r
+
+            \t\t\t{%- if not col.nullable %} NOT NULL\r
+
+            \t\t\t\t{%- if col.defaultValue | length > 0 %} DEFAULT
+            {{ col.defaultValue }}{% endif %}\r
+
+            \t\t\t{% endif %}\r
+
+            \t\t\t{%- if col.description | length > 0 %} COMMENT '{{
+            col.description }}'{% endif %}\r
+
+            \t\t\t{%- if not loop.last -%}, {% endif %}\r
+
+            \t\t{% endfor %}\r
+
+            \t)\r
+
+            {% endif %}\r
+
+            \r
 
             {%- if node.description | length > 0 %} COMMENT = '{{
             node.description }}'{% endif %}\r\n"

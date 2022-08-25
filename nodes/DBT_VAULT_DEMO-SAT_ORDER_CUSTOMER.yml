@@ -1,0 +1,193 @@
+steps:
+  SAT_ORDER_CUSTOMER-45:
+    operation:
+      config:
+        WhereSql: ""
+        postSQL: ""
+        preSQL: ""
+      database: ""
+      dependencies: []
+      description: ""
+      isDataVault: false
+      isMultisource: false
+      locationID: 6
+      locationName: DBT_VAULT_DEMO
+      materializationType: table
+      metadata:
+        appliedNodeTests: []
+        columns:
+          - columnReference:
+              columnCounter: 1178
+              stepCounter: 45
+            config:
+              isChangeHash: true
+              isHubHash: true
+            dataType: BINARY(16)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMER_PK
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 637
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1193
+              stepCounter: 45
+            dataType: BINARY(16)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMER_HASHDIFF
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 652
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1162
+              stepCounter: 45
+            dataType: VARCHAR(25)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMER_NAME
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 621
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1163
+              stepCounter: 45
+            dataType: VARCHAR(40)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMER_ADDRESS
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 622
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1165
+              stepCounter: 45
+            dataType: VARCHAR(15)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMER_PHONE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 624
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1166
+              stepCounter: 45
+            dataType: NUMBER(12,2)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMER_ACCBAL
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 625
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1167
+              stepCounter: 45
+            dataType: VARCHAR(10)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMER_MKTSEGMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 626
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1168
+              stepCounter: 45
+            dataType: VARCHAR(117)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: CUSTOMER_COMMENT
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 627
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1177
+              stepCounter: 45
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: EFFECTIVE_FROM
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 636
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1198
+              stepCounter: 45
+            dataType: DATE
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: LOAD_DATE
+            nullable: true
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 657
+                    stepCounter: "34"
+                transform: ""
+          - columnReference:
+              columnCounter: 1203
+              stepCounter: "45"
+            dataType: VARCHAR(14)
+            description: ""
+            hashColumns: []
+            hashDetails: null
+            name: RECORD_SOURCE
+            nullable: false
+            sourceColumnReferences:
+              - columnReferences:
+                  - columnCounter: 635
+                    stepCounter: "34"
+                transform: ""
+        cteString: ""
+        enabledColumnTestIDs: []
+        sourceMapping:
+          - customSQL:
+              customSQL: ""
+            dependencies:
+              - locationName: DBT_VAULT_DEMO
+                nodeName: V_STG_ORDERS
+            join:
+              joinCondition: FROM {{ ref('DBT_VAULT_DEMO', 'V_STG_ORDERS') }} "V_STG_ORDERS"
+            name: SAT_ORDER_CUSTOMER
+            noLinkRefs: []
+      name: SAT_ORDER_CUSTOMER
+      overrideSQL: false
+      schema: ""
+      sqlType: "10"
+      type: sql
+    stepCounter: "45"

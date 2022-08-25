@@ -1,5 +1,5 @@
 steps:
-  HUB_CUSTOMER-37:
+  HUB_NATION-39:
     operation:
       config:
         WhereSql: ""
@@ -17,40 +17,39 @@ steps:
         appliedNodeTests: []
         columns:
           - columnReference:
-              columnCounter: 781
-              stepCounter: "37"
+              columnCounter: 878
+              stepCounter: 39
+            config: {}
             dataType: BINARY(16)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: CUSTOMER_PK
+            name: NATION_PK
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 637
-                    stepCounter: "34"
+                  - columnCounter: 585
+                    stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 732
-              stepCounter: 37
+              columnCounter: 871
+              stepCounter: 39
             config:
               isHubHash: true
             dataType: NUMBER(38,0)
             description: ""
             hashColumns: []
             hashDetails: null
-            name: CUSTOMERKEY
-            nullable: false
+            name: NATION_KEY
+            nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 613
-                    stepCounter: "34"
+                  - columnCounter: 578
+                    stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 776
-              stepCounter: 37
-            config:
-              isHubHash: true
+              columnCounter: 888
+              stepCounter: 39
             dataType: DATE
             description: ""
             hashColumns: []
@@ -59,13 +58,13 @@ steps:
             nullable: true
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 657
-                    stepCounter: "34"
+                  - columnCounter: 595
+                    stepCounter: "33"
                 transform: ""
           - columnReference:
-              columnCounter: 779
-              stepCounter: "37"
-            dataType: VARCHAR(11)
+              columnCounter: 892
+              stepCounter: 39
+            dataType: VARCHAR(14)
             description: ""
             hashColumns: []
             hashDetails: null
@@ -73,26 +72,27 @@ steps:
             nullable: false
             sourceColumnReferences:
               - columnReferences:
-                  - columnCounter: 635
-                    stepCounter: "34"
+                  - columnCounter: 580
+                    stepCounter: "33"
                 transform: ""
         cteString: ""
         enabledColumnTestIDs: []
         sourceMapping:
           - aliases:
-              V_STG_ORDERS: "34"
+              V_STG_INVENTORY: "33"
             customSQL:
               customSQL: ""
             dependencies:
               - locationName: DBT_VAULT_DEMO
-                nodeName: V_STG_ORDERS
+                nodeName: V_STG_INVENTORY
             join:
-              joinCondition: FROM {{ ref('DBT_VAULT_DEMO', 'V_STG_ORDERS') }} "V_STG_ORDERS"
-            name: HUB_CUSTOMER
+              joinCondition: FROM {{ ref('DBT_VAULT_DEMO', 'V_STG_INVENTORY') }}
+                "V_STG_INVENTORY"
+            name: HUB_NATION
             noLinkRefs: []
-      name: HUB_CUSTOMER
+      name: HUB_NATION
       overrideSQL: false
       schema: ""
       sqlType: "4"
       type: sql
-    stepCounter: "37"
+    stepCounter: "39"
